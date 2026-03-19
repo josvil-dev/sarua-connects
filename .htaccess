@@ -1,4 +1,12 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteRule ^(.*)$ public/$1 [L]
+
+    # If request is already under /public, do nothing.
+    RewriteRule ^public/ - [L]
+
+    # Root request should go directly to Laravel front controller.
+    RewriteRule ^$ public/index.php [L]
+
+    # For everything else, serve from /public.
+    RewriteRule (.*) public/$1 [L]
 </IfModule>
