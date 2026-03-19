@@ -7,7 +7,7 @@
 
 set -e
 
-PHP_BIN="php8.2"
+PHP_BIN="php8.4"
 
 find_composer() {
 	if command -v composer >/dev/null 2>&1; then
@@ -23,6 +23,21 @@ find_composer() {
 	return 1
 }
 
+run_composer_install() {
+	COMPOSER_BIN="$1"
+
+	if [ "$COMPOSER_BIN" = "composer.phar" ]; then
+		"$PHP_BIN" "$COMPOSER_BIN" install --no-dev --optimize-autoloader --no-interaction
+	else
+		"$COMPOSER_BIN" install --no-dev --optimize-autoloader --no-interaction
+	fi
+}
+
+env_value() {
+	KEY="$1"
+	grep -E "^${KEY}=" .env 2>/dev/null | tail -n 1 | cut -d '=' -f2- | sed -e 's/^"//' -e 's/"$//'
+}
+
 if [ ! -f ".env" ]; then
 	echo "==> [preflight] .env not found, creating from .env.example..."
 	cp .env.example .env
@@ -34,7 +49,7 @@ if [ ! -f "vendor/autoload.php" ]; then
 	COMPOSER_BIN=""
 	if COMPOSER_BIN="$(find_composer)"; then
 		echo "==> [preflight] vendor missing, installing dependencies..."
-		"$PHP_BIN" "$COMPOSER_BIN" install --no-dev --optimize-autoloader --no-interaction
+		run_composer_install "$COMPOSER_BIN"
 	else
 		echo "ERROR: vendor/autoload.php is missing and composer is not available on this server."
 		echo "Fix: upload the vendor/ folder from local machine, then run this script again."
@@ -42,9 +57,24 @@ if [ ! -f "vendor/autoload.php" ]; then
 	fi
 fi
 
+DB_CONNECTION_VALUE="$(env_value DB_CONNECTION)"
+DB_DATABASE_VALUE="$(env_value DB_DATABASE)"
+
+if [ "$DB_CONNECTION_VALUE" = "sqlite" ]; then
+	echo "ERROR: .env is still using DB_CONNECTION=sqlite."
+	echo "Update .env with your Xneelo MySQL credentials, then run: bash deploy.sh"
+	exit 1
+fi
+
+if [ -z "$DB_DATABASE_VALUE" ] || [ "$DB_DATABASE_VALUE" = "your_cpanel_db_name" ]; then
+	echo "ERROR: .env DB_DATABASE is not set to your real cPanel database name."
+	echo "Update .env DB_DATABASE/DB_USERNAME/DB_PASSWORD, then run: bash deploy.sh"
+	exit 1
+fi
+
 echo "==> [1/8] Installing PHP dependencies (no dev)..."
 if COMPOSER_BIN="$(find_composer)"; then
-	"$PHP_BIN" "$COMPOSER_BIN" install --no-dev --optimize-autoloader --no-interaction
+	run_composer_install "$COMPOSER_BIN"
 else
 	echo "==> [1/8] Composer not found, skipping install (vendor already present)."
 fi
