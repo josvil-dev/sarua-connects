@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_active')->default(true);
-            $table->timestamp('deactivated_at')->nullable();
-        });
+        if (! Schema::hasColumn('users', 'is_active')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->boolean('is_active')->default(true);
+            });
+        }
+
+        if (! Schema::hasColumn('users', 'deactivated_at')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->timestamp('deactivated_at')->nullable();
+            });
+        }
     }
 
     /**
@@ -22,8 +29,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['is_active', 'deactivated_at']);
-        });
+        if (Schema::hasColumn('users', 'is_active')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropColumn('is_active');
+            });
+        }
+
+        if (Schema::hasColumn('users', 'deactivated_at')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropColumn('deactivated_at');
+            });
+        }
     }
 };

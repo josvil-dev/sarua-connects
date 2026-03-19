@@ -330,6 +330,9 @@
                     <li><a href="{{ route('dashboard') }}">Dashboard</a></li>
                     <li><a href="{{ route('my-profile') }}">My Profile</a></li>
                     <li><a href="{{ route('search') }}">Search</a></li>
+                    @if(Auth::user()->is_admin)
+                        <li><a href="{{ route('admin.index') }}" style="background:#d7df23;color:#111;font-weight:700;">Admin</a></li>
+                    @endif
                     <li>
                         <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                             @csrf

@@ -14,14 +14,13 @@
     .profile-back-link {
         display: inline-block;
         margin-bottom: 1.5rem;
-        padding: 0.55rem 1.25rem;
+        padding: 0.50rem 1rem;
         background: #fff;
         color: #000;
         text-decoration: none;
         font-weight: 700;
         font-size: 0.82rem;
         letter-spacing: 0.1em;
-        text-transform: uppercase;
         border: 2px solid #000;
         transition: background 0.2s, color 0.2s;
     }
@@ -33,13 +32,13 @@
 
     /* ── Layout ── */
     .profile-wrapper {
-        width: 100%;
+        max-width: 1100px;
         display: grid;
         grid-template-columns: 35% 65%;
         gap: 1.75rem;
         align-items: start;
-        padding: 0 180px;
-        margin-top: 2.5rem;
+        margin: 2rem auto;
+        
     }
 
     /* ── LEFT SIDEBAR ── */
@@ -177,7 +176,7 @@
     .sidebar-cv-btn {
         display: block;
         width: 100%;
-        padding: 0.7rem 1rem;
+        padding: 0.5rem 1rem;
         background: #1a1a2e;
         color: #fff;
         font-weight: 700;
@@ -190,7 +189,7 @@
     }
 
     .sidebar-cv-btn:hover {
-        background: #2e2e50;
+        background: #000000;
         transform: translateY(-1px);
     }
 
@@ -331,7 +330,7 @@
 
     <!-- ═══════════════ LEFT SIDEBAR ═══════════════ -->
     <aside class="profile-sidebar">
-<a href="{{ route('search') }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="profile-back-link">← Back to Search</a>
+<a href="{{ route('search') }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}" class="profile-back-link">Back to Search</a>
         @if($user->photo)
             <img src="{{ Storage::url($user->photo) }}"
                  alt="{{ $user->first_name }}'s Photo"
@@ -374,8 +373,8 @@
                 </div>
 
               <div style="text-align: center; padding: 0.7rem;">
-    <a href="mailto:{{ $user->email }}" 
-       class="btn-secondary-action">
+    <a  href="mailto:{{ $user->email }}" 
+       class="sidebar-cv-btn">
         Email me
     </a>
 </div>
@@ -391,11 +390,11 @@
         @if($user->cv)
             @if(Auth::id() == $user->id)
                 <a href="{{ Storage::url($user->cv) }}" download class="sidebar-cv-btn">
-                    Download My CV / Resume
+                    Download CV
                 </a>
             @else
                 <a href="{{ Storage::url($user->cv) }}" download class="sidebar-cv-btn" id="cv-download-btn">
-                    Download CV / Resume
+                    Download CV
                 </a>
             @endif
         @endif

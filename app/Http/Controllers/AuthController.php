@@ -328,14 +328,30 @@ class AuthController extends Controller
     public function showSearch(Request $request)
     {
         $query = User::where('registration_step', '>=', 2); // Only show users with some profile info
+
+        $selectedCountries = collect($request->input('country', []))
+            ->when($request->filled('country') && !is_array($request->input('country')), function ($collection) use ($request) {
+                return collect([$request->input('country')]);
+            })
+            ->filter(fn ($value) => is_string($value) && trim($value) !== '')
+            ->values()
+            ->all();
+
+        $selectedInstitutions = collect($request->input('institution', []))
+            ->when($request->filled('institution') && !is_array($request->input('institution')), function ($collection) use ($request) {
+                return collect([$request->input('institution')]);
+            })
+            ->filter(fn ($value) => is_string($value) && trim($value) !== '')
+            ->values()
+            ->all();
         
         // Apply filters
-        if ($request->filled('country')) {
-            $query->where('country', $request->country);
+        if (!empty($selectedCountries)) {
+            $query->whereIn('country', $selectedCountries);
         }
         
-        if ($request->filled('institution')) {
-            $query->where('institution', 'like', '%' . $request->institution . '%');
+        if (!empty($selectedInstitutions)) {
+            $query->whereIn('institution', $selectedInstitutions);
         }
         
         if ($request->filled('job_title')) {

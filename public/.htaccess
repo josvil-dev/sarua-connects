@@ -5,6 +5,12 @@
 
     RewriteEngine On
 
+    # Force HTTPS in production (must come before routing rules)
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP_HOST} !^localhost
+    RewriteCond %{HTTP_HOST} !^127\.
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -22,4 +28,29 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+</IfModule>
+
+# ── Security headers ──────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# ── Protect sensitive files ────────────────────────────────────
+<FilesMatch "^\.env|composer\.(json|lock)|package(-lock)?\.json|deploy\.sh">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# ── PHP settings (override where cPanel allows) ────────────────
+<IfModule mod_php.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 22M
+    php_value max_execution_time 60
+    php_value memory_limit 256M
+    php_flag display_errors Off
+    php_flag log_errors On
 </IfModule>

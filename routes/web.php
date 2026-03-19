@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ConnectionController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,4 +51,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/connect/accept/{connection}', [ConnectionController::class, 'acceptRequest'])->name('connection.accept');
     Route::post('/connect/decline/{connection}', [ConnectionController::class, 'declineRequest'])->name('connection.decline');
     Route::get('/connect/status/{user}', [ConnectionController::class, 'getConnectionStatus'])->name('connection.status');
+
+    // Admin routes
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::post('/users/{user}/toggle-active', [AdminController::class, 'toggleActive'])->name('users.toggle-active');
+        Route::post('/users/{user}/ban', [AdminController::class, 'ban'])->name('users.ban');
+        Route::post('/users/{user}/unban', [AdminController::class, 'unban'])->name('users.unban');
+        Route::delete('/users/{user}', [AdminController::class, 'destroy'])->name('users.destroy');
+    });
 });

@@ -32,9 +32,11 @@
 
     /* ── SHELL ── */
     .db-shell {
+          max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 2rem;
         display: flex;
         align-items: flex-start; 
-         padding: 2rem 10rem;
     }
 
     /* ── SIDEBAR ──
@@ -215,8 +217,6 @@
         font-family: var(--font);
         font-size: 1rem;
         font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
         color: var(--dark);
         cursor: pointer;
         transition: background 0.15s;
@@ -445,7 +445,7 @@
     /* ── PEOPLE LIST ── */
     .db-people-list {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 2fr));
+        grid-template-columns:grid-template-columns: 1fr;
         gap: 1px;
         background: var(--border);
     }
@@ -516,7 +516,6 @@
         font-family: var(--font);
         font-size: 0.78rem;
         font-weight: 700;
-        text-transform: uppercase;
         letter-spacing: 0.06em;
         color: var(--gray-500);
         text-decoration: none;
@@ -528,13 +527,12 @@
     .btn-outline-sm:hover { border-color: var(--dark); color: var(--dark); }
 
     .btn-accent-sm {
-        padding: 0.45rem 0.9rem;
+        padding: 0.45rem 1rem;
         background: var(--accent);
         border: 1px solid var(--accent);
         font-family: var(--font);
         font-size: 0.78rem;
         font-weight: 700;
-        text-transform: uppercase;
         letter-spacing: 0.06em;
         color: var(--dark);
         cursor: pointer;
@@ -611,8 +609,6 @@
         font-family: var(--font);
         font-size: 1rem;
         font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1rem;
         border: none;
         cursor: pointer;
         transition: background 0.15s;
@@ -661,7 +657,6 @@
 
             <div class="db-nav-label">Network</div>
             <a href="{{ route('search') }}">Search academics</a>
-            <a href="{{ route('search') }}">Browse all</a>
         </nav>
 
     </aside>

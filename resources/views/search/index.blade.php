@@ -13,6 +13,9 @@
         font-family: 'Inter', sans-serif;
         min-height: 100vh;
         background: #fff;
+        max-width: 1150px;
+        margin: 2rem auto;
+      
     }
 
     /* ── TOP HERO SEARCH BAR ── */
@@ -26,7 +29,7 @@
     }
 
     .search-hero-inner {
-        width: 70%;
+        width: 90%;
         margin: 0 auto;
     }
 
@@ -105,7 +108,7 @@
     .main-layout {
         display: flex;
         gap: 0;
-        width:70%;
+        width:90%;
         margin: 0 auto;
         height: calc(100vh - 136px);
     }
@@ -349,6 +352,19 @@
 
     .filter-select:focus { border-color: #d7df23; background-color: #fff; box-shadow: 0 0 0 3px rgba(215,223,35,0.12); }
 
+    .filter-select-multi {
+        min-height: 180px;
+        background-image: none;
+        padding-right: 0.85rem;
+    }
+
+    .filter-search-hint {
+        display: block;
+        margin-top: 0.4rem;
+        font-size: 0.72rem;
+        color: #7a7a7a;
+    }
+
     .filter-badge {
         background: #d7df23;
         color: #111;
@@ -444,8 +460,16 @@
                     <input type="text" name="search" class="top-search-input"
                            value="{{ request('search') }}"
                            placeholder="Search by name, job title, institution, or keywords…">
-                    <input type="hidden" name="country" value="{{ request('country') }}">
-                    <input type="hidden" name="institution" value="{{ request('institution') }}">
+                    @foreach((array) request()->input('country', []) as $selectedCountry)
+                        @if($selectedCountry)
+                            <input type="hidden" name="country[]" value="{{ $selectedCountry }}">
+                        @endif
+                    @endforeach
+                    @foreach((array) request()->input('institution', []) as $selectedInstitution)
+                        @if($selectedInstitution)
+                            <input type="hidden" name="institution[]" value="{{ $selectedInstitution }}">
+                        @endif
+                    @endforeach
                     <input type="hidden" name="job_title" value="{{ request('job_title') }}">
                     <input type="hidden" name="keywords" value="{{ request('keywords') }}">
                     <input type="hidden" name="areas_of_interest" value="{{ request('areas_of_interest') }}">
@@ -472,33 +496,37 @@
 
                 <!-- COUNTRY -->
                 <div class="accordion-item">
-                    <button type="button" class="accordion-trigger {{ request('country') ? 'open' : '' }}" data-target="acc-country">
-                        <span>Country @if(request('country'))<span class="filter-badge">1</span>@endif</span>
+                    <button type="button" class="accordion-trigger {{ count((array) request()->input('country', [])) ? 'open' : '' }}" data-target="acc-country">
+                        <span>Country @if(count((array) request()->input('country', [])))<span class="filter-badge">{{ count((array) request()->input('country', [])) }}</span>@endif</span>
                         <i class="chevron">▾</i>
                     </button>
-                    <div class="accordion-body {{ request('country') ? 'open' : '' }}" id="acc-country">
-                        <select name="country" class="filter-select" onchange="document.getElementById('filterForm').submit()">
-                            <option value="">All Countries</option>
+                    <div class="accordion-body {{ count((array) request()->input('country', [])) ? 'open' : '' }}" id="acc-country">
+                        <input type="text" class="filter-input" placeholder="Search countries..." data-option-search="country-filter">
+                        <select name="country[]" id="country-filter" class="filter-select filter-select-multi" multiple>
                             @foreach($countries as $country)
-                                <option value="{{ $country }}" {{ request('country') == $country ? 'selected' : '' }}>{{ $country }}</option>
+                                <option value="{{ $country }}" {{ in_array($country, (array) request()->input('country', []), true) ? 'selected' : '' }}>{{ $country }}</option>
                             @endforeach
                         </select>
+                        <span class="filter-search-hint">Type to filter options, then hold Ctrl/Cmd to pick multiple.</span>
+                        <button type="submit" class="apply-btn">Apply</button>
                     </div>
                 </div>
 
                 <!-- INSTITUTION -->
                 <div class="accordion-item">
-                    <button type="button" class="accordion-trigger {{ request('institution') ? 'open' : '' }}" data-target="acc-institution">
-                        <span>Institution @if(request('institution'))<span class="filter-badge">1</span>@endif</span>
+                    <button type="button" class="accordion-trigger {{ count((array) request()->input('institution', [])) ? 'open' : '' }}" data-target="acc-institution">
+                        <span>Institution @if(count((array) request()->input('institution', [])))<span class="filter-badge">{{ count((array) request()->input('institution', [])) }}</span>@endif</span>
                         <i class="chevron">▾</i>
                     </button>
-                    <div class="accordion-body {{ request('institution') ? 'open' : '' }}" id="acc-institution">
-                        <select name="institution" class="filter-select" onchange="document.getElementById('filterForm').submit()">
-                            <option value="">All Institutions</option>
-                            @foreach($institutions->take(50) as $institution)
-                                <option value="{{ $institution }}" {{ request('institution') == $institution ? 'selected' : '' }}>{{ $institution }}</option>
+                    <div class="accordion-body {{ count((array) request()->input('institution', [])) ? 'open' : '' }}" id="acc-institution">
+                        <input type="text" class="filter-input" placeholder="Search institutions..." data-option-search="institution-filter">
+                        <select name="institution[]" id="institution-filter" class="filter-select filter-select-multi" multiple>
+                            @foreach($institutions as $institution)
+                                <option value="{{ $institution }}" {{ in_array($institution, (array) request()->input('institution', []), true) ? 'selected' : '' }}>{{ $institution }}</option>
                             @endforeach
                         </select>
+                        <span class="filter-search-hint">Type to filter options, then hold Ctrl/Cmd to pick multiple.</span>
+                        <button type="submit" class="apply-btn">Apply</button>
                     </div>
                 </div>
 
@@ -628,6 +656,19 @@
             const isOpen = trigger.classList.contains('open');
             trigger.classList.toggle('open', !isOpen);
             body.classList.toggle('open', !isOpen);
+        });
+    });
+
+    document.querySelectorAll('[data-option-search]').forEach(searchInput => {
+        searchInput.addEventListener('input', () => {
+            const selectId = searchInput.getAttribute('data-option-search');
+            const select = document.getElementById(selectId);
+            const term = searchInput.value.trim().toLowerCase();
+
+            Array.from(select.options).forEach(option => {
+                const match = option.text.toLowerCase().includes(term);
+                option.hidden = !match;
+            });
         });
     });
 </script>

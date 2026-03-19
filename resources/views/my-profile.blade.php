@@ -105,7 +105,7 @@
     .edit-profile-btn {
         background: #000000;
         color: #fff;
-        padding: 0.7rem 1.2rem;
+        padding: 0.6rem 0.90rem;
         border: none;
       margin-top: 1rem;
         font-weight: 600;
@@ -401,10 +401,10 @@
             @endif
 
             <a href="{{ route('profile.edit') }}" class="edit-profile-btn">
-                 EDIT PROFILE
+                 Edit Profile
             </a>
               <a href="{{ route('search') }}" class="edit-profile-btn">
-                 SEARCH
+                 Search
             </a>
         </div>
 

@@ -35,6 +35,12 @@ class User extends Authenticatable
         'areas_of_interest',
         'isced_codes',
         'registration_step',
+        'is_active',
+        'deactivated_at',
+        'is_admin',
+        'is_banned',
+        'banned_at',
+        'ban_reason',
     ];
 
     /**
@@ -59,6 +65,11 @@ class User extends Authenticatable
             'password' => 'hashed',
             'areas_of_interest' => 'array',
             'isced_codes' => 'array',
+            'is_active' => 'boolean',
+            'is_admin' => 'boolean',
+            'is_banned' => 'boolean',
+            'deactivated_at' => 'datetime',
+            'banned_at' => 'datetime',
         ];
     }
 
